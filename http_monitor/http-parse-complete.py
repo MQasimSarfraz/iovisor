@@ -204,12 +204,11 @@ while 1:
   if ((payload_string[:3] == "GET") or (payload_string[:4] == "POST")   or (payload_string[:4] == "HTTP")  \
   or ( payload_string[:3] == "PUT") or (payload_string[:6] == "DELETE") or (payload_string[:4] == "HEAD") ):
     #match: HTTP GET/POST packet found
-    print ("Total sys_open calls = %s" % (bpf_stats[ bpf_stats.Key(0) ].value))
-    #Set the sys_open count to zero
-    bpf_stats[ bpf_stats.Key(0) ] = bpf_stats.Leaf(0)
-    if (crlf in payload_string):
-      #url entirely contained in first packet -> print it all
-      printUntilCRLF(payload_string)
+    #Check for HTTP responce and Print the counter
+    #Reset the counter after that
+    if (payload_string[:4] == "HTTP"):
+      print ("Total sys_read calls = %s" % (bpf_stats[ bpf_stats.Key(0) ].value))
+      bpf_stats[ bpf_stats.Key(0) ] = bpf_stats.Leaf(0)
 
       #delete current_Key from bpf_sessions, url already printed. current session not useful anymore 
       try:
